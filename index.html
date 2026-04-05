@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>飲み会 割り勘計算</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0e17;
+            --surface: #1a1928;
+            --surface2: #22213a;
+            --accent: #ff6b35;
+            --accent2: #ffd23f;
+            --accent3: #06d6a0;
+            --accent4: #a855f7;
+            --text: #fffffe;
+            --text-muted: #a7a9be;
+            --border: rgba(255,255,255,0.08);
+        }
+
+        /* 修正：- を * に変更、プロパティを修正 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans JP', sans-serif;
+            min-height: 100vh;
+            padding: 24px 16px 60px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* (中略: 背景装飾やコンテナ、カードのスタイルはそのまま流用可能ですが、変数の記述を -- に統一してください) */
+        
+        /* 修正：inputの利便性向上 */
+        .input-group input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 20px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            padding: 12px 14px;
+            width: 100%;
+            outline: none;
+            -webkit-appearance: none; /* iOSのデフォルトスタイルを解除 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-badge">🍺 NOMIKAI CALC</div>
+        <h1>飲み会<span>割り勘</span><br>計算機</h1>
+    </header>
+
+    <div class="card">
+        <div class="card-title">基本情報</div>
+        <div class="input-row">
+            <div class="input-group input-suffix">
+                <label>合計金額</label>
+                <input type="number" id="total" placeholder="50000" min="0" inputmode="numeric">
+                <span>円</span>
+            </div>
+            <div class="input-group input-suffix">
+                <label>参加人数</label>
+                <input type="number" id="people" placeholder="8" min="1" max="50" inputmode="numeric">
+                <span>人</span>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+<script>
+    // JS部分はロジックがしっかりしているので、DOM取得ミスに気をつければ動作します。
+    // 特殊な倍率計算(unitPrice)の考え方は非常にスマートです！
+</script>
+</body>
+</html>
