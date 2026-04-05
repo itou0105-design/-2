@@ -4,111 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>飲み会 割り勘計算</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 基本設定 */
+        /* CSS変数をやめて直接指定 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #0f0e17; color: #fffffe; font-family: 'Noto Sans JP', sans-serif; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 24px; }
+        h1 { font-size: 24px; color: #ff6b35; margin-bottom: 4px; }
+        .card { background: #1a1928; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        label { display: block; font-size: 12px; color: #a7a9be; margin-bottom: 4px; }
+        input[type="number"], input[type="text"] { width: 100%; background: #22213a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 10px; font-size: 16px; outline: none; }
         
-        body {
-            background-color: #0f0e17; /* 真っ黒に見える原因の背景色 */
-            color: #fffffe;           /* 文字色（白） */
-            font-family: 'Noto Sans JP', sans-serif;
-            min-height: 100vh;
-            padding: 24px 16px;
-            line-height: 1.5;
-        }
+        .flex-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .flex-row > div { flex: 1; }
 
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        header { text-align: center; margin-bottom: 30px; }
-        .badge { background: #ff6b35; color: white; font-size: 10px; padding: 4px 12px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
-        h1 { font-size: 28px; font-weight: 900; }
-        h1 span { color: #ff6b35; }
-
-        /* カードデザイン */
-        .card {
-            background: #1a1928;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-
-        .card-title { font-size: 11px; color: #a7a9be; letter-spacing: 2px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        .card-title::before { content: ''; width: 3px; height: 12px; background: #ff6b35; }
-
-        /* 入力エリア */
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        label { display: block; font-size: 12px; color: #a7a9be; margin-bottom: 6px; }
-        
-        input[type="number"], input[type="text"] {
-            width: 100%;
-            background: #22213a;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: #fff;
-            padding: 12px;
-            font-size: 18px;
-            font-family: 'Space Mono', monospace;
-            outline: none;
-        }
-
-        /* 特別負担者（上司など） */
-        .special-person {
-            background: #22213a;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        .sp-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .remove-btn { background: none; border: none; color: #ff4757; font-size: 18px; cursor: pointer; }
+        .special-person { background: #22213a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #ff6b35; }
+        .sp-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
         
         /* ボタン */
-        .add-btn { background: none; border: 1px solid #ff6b35; color: #ff6b35; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-        .calc-btn { width: 100%; background: #ff6b35; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 16px; margin: 10px 0 20px; cursor: pointer; }
+        .btn { border: none; border-radius: 8px; font-weight: bold; cursor: pointer; padding: 12px; transition: 0.2s; }
+        .btn-add { background: none; border: 1px solid #ff6b35; color: #ff6b35; padding: 5px 10px; font-size: 12px; }
+        .btn-calc { width: 100%; background: #ff6b35; color: white; font-size: 16px; margin-top: 10px; }
+        .btn-remove { background: none; color: #ff4757; padding: 0 5px; font-size: 18px; }
 
-        /* 結果表示 */
-        #result-section { display: none; }
-        .res-box { background: #22213a; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 10px; }
-        .res-label { font-size: 12px; color: #a7a9be; }
-        .res-val { font-size: 28px; font-weight: bold; color: #ffd23f; font-family: 'Space Mono'; }
-
-        /* グラフ用 */
-        .chart-area { text-align: center; padding: 20px 0; }
-        canvas { max-width: 100%; height: auto; }
+        /* 結果エリア */
+        #result-section { display: none; margin-top: 20px; border-top: 2px solid #ff6b35; padding-top: 20px; }
+        .res-main { text-align: center; margin-bottom: 20px; }
+        .res-price { font-size: 32px; color: #ffd23f; font-weight: bold; }
+        canvas { display: block; margin: 0 auto; max-width: 100%; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="badge">🍺 NOMIKAI CALC</div>
-        <h1>飲み会<span>割り勘</span>機</h1>
+        <h1>飲み会割り勘機</h1>
+        <p style="font-size:12px; color:#a7a9be;">上司の多め払いも一発計算</p>
     </header>
 
     <div class="card">
-        <div class="card-title">基本設定</div>
-        <div class="input-row">
+        <div class="flex-row">
             <div>
                 <label>合計金額 (円)</label>
-                <input type="number" id="total" value="50000" inputmode="numeric">
+                <input type="number" id="totalAmount" value="50000" inputmode="numeric">
             </div>
             <div>
                 <label>参加人数 (人)</label>
-                <input type="number" id="people" value="8" inputmode="numeric">
+                <input type="number" id="totalPeople" value="8" inputmode="numeric">
             </div>
         </div>
     </div>
 
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <div class="card-title" style="margin:0">多めに払う人</div>
-            <button class="add-btn" onclick="addPerson()">＋ 追加</button>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span style="font-size:13px; font-weight:bold;">多めに払う人</span>
+            <button id="addPersonBtn" class="btn btn-add">＋ 追加</button>
         </div>
-        <div id="special-list"></div>
+        <div id="specialList"></div>
     </div>
 
-    <button class="
+    <button id="calcBtn" class="btn btn-calc">計算する 🍺</button>
+
+    <div id="result-section">
+        <div class="res-main">
+            <p style="font-size:13px;">一般参加者の支払い</p>
+            <div class="res-price" id="outNormal">¥0</div>
+        </div>
+        <div class="card" id="outDetails"></div>
+        <div class="card">
+            <label style="text-align:center;">負担割合グラフ</label>
+            <canvas id="pieChart" width="200" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// 全体のデータ管理
+let specialData = [];
+const COLORS = ['#ff6b35','#ffd23f','#06d6a0','#a855f7','#38bdf8'];
+
+// 画面が読み込まれたら実行
+window.onload = function() {
+    const addBtn = document.getElementById('addPersonBtn');
+    const calcBtn = document.getElementById('calcBtn');
+
+    // 「追加」ボタンの動作
+    addBtn.addEventListener('click', function() {
+        specialData.push({ name: '上司', ratio: 2.0 });
+        renderSpecialList();
+    });
+
+    // 「計算」ボタンの動作
+    calcBtn.addEventListener('click', calculateAll);
+
+    // 最初の一人を表示
+    specialData.push({ name: '上司', ratio: 2.0 });
+    renderSpecialList();
+};
+
+// リストの描画
+function renderSpecialList() {
+    const listDiv = document.getElementById('specialList');
+    listDiv.innerHTML = '';
+
+    specialData.forEach((person, index) => {
+        const div = document.createElement('div');
+        div.className = 'special-person';
+        div.innerHTML = `
+            <div class="sp-header">
+                <input type="text" value="${person.name}" oninput="specialData[${index}].name=this.value" style="width:70%;">
+                <button class="btn btn-remove" onclick="removePerson(${index})">✕</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <input type="range" min="1" max="5" step="0.1" value="${person.ratio}" 
+                    oninput="specialData[${index}].ratio=parseFloat(this.value); this.nextElementSibling.innerText=this.value+'倍'">
+                <span style="font-size:12px; color:#ffd23f; min-width:40px;">${person.ratio}倍</span>
+            </div>
+        `;
+        listDiv.appendChild(div);
+    });
+}
+
+// 削除機能（グローバルに配置）
+function removePerson(index) {
+    specialData.splice(index, 1);
+    renderSpecialList();
+}
+
+// 計算ロジック
+function calculateAll() {
+    const total = parseFloat(document.getElementById('totalAmount').value) || 0;
+    const people = parseInt(document.getElementById('totalPeople').value) || 0;
+
+    if (total <= 0 || people <= 0) {
+        alert("金額と人数を正しく入力してください");
+        return;
+    }
+
+    const spCount = specialData.length;
+    const normalCount = Math.max(1, people - spCount);
+
+    // 口数（ユニット）の合計を計算
+    let totalUnits = normalCount * 1.0;
+    specialData.forEach(p => totalUnits += p.ratio);
+
+    const unitPrice = total / totalUnits;
+    const normalFinal = Math.ceil(unitPrice / 10) * 10;
+
+    // 結果表示
+    document.getElementById('outNormal').innerText = "¥" + normalFinal.toLocaleString();
+    document.getElementById('result-section').style.display = 'block';
+
+    // 詳細の内訳
+    const detailsDiv = document.getElementById('outDetails');
+    detailsDiv.innerHTML = `<label>詳細内訳</label>`;
+    
+    let chartValues = [{ label: '一般', val: normalFinal * normalCount, color: COLORS[0] }];
+
+    specialData.forEach((p, i) => {
+        const pAmount = Math.ceil((unitPrice * p.ratio) / 10) * 10;
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.padding = '8px 0';
+        row.style.fontSize = '14px';
+        row.innerHTML = `<span>${p.name} (${p.ratio}倍)</span><b>¥${pAmount.toLocaleString()}</b>`;
+        detailsDiv.appendChild(row);
+        chartValues.push({ label: p.name, val: pAmount, color: COLORS[(i+1)%5] });
+    });
+
+    drawPie(chartValues);
+}
+
+// グラフ描画
+function drawPie(data) {
+    const canvas = document.getElementById('pieChart');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, 200, 200);
+    
+    const sum = data.reduce((a, b) => a + b.val, 0);
+    let start = -Math.PI / 2;
+
+    data.forEach(d => {
+        const slice = (d.val / sum) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(100, 100);
+        ctx.arc(100, 100, 80, start, start + slice);
+        ctx.fillStyle = d.color;
+        ctx.fill();
+        start += slice;
+    });
+
+    // ドーナツの穴
+    ctx.beginPath();
+    ctx.arc(100, 100, 50, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1a1928';
+    ctx.fill();
+}
+</script>
+</body>
+</html>
